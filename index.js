@@ -1,13 +1,14 @@
 const inquirer = require('inquirer');
 const convert = require('color-convert');
 const fs = require('fs');
-const shapeMap = require('./lib/shapes');
+const { shapeMap, ShapeClasses } = require('./lib/shapes');
+
 
 inquirer
     .prompt([
         {
             type: 'input',
-            name: 'logotxt',
+            name: 'text',
             message: 'Choose 3 letters for your logo!',
             validate: (input) => {
                 if (input.length !== 3) {
@@ -69,16 +70,18 @@ inquirer
         },
     ])
 
-      
-      .then((answers) => {
-        
-        //not finding shapes
-        const shapeClass = shapeMap[answers.shape];
-        const shape = new shapeClass();
-        shape.setColor(answers.Logoclr);
-        const svgCode = shape.render();
+    .then((answers) => {
+        console.log('Answers:', JSON.stringify(answers));
 
-    
+        const ShapeClass = shapeMap[answers.Shapes];
+        const shape = new ShapeClass();
+        shape.setColor(answers.shapeclr);
+        const userText = answers.text;
+        const textColor = answers.txtclr;
+        const svgCode = shape.toSVG(userText, textColor);
+        
+        
         // write SVG code to file
         fs.writeFileSync('my-logo.svg', svgCode);
-      });
+    });
+    
